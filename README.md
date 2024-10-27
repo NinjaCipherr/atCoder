@@ -11,14 +11,13 @@
 ## 学習リソース
 - **プログラミング言語:** 主にC++とPythonを使用しています。
 - **参考文献:**
-  - [C++ Primer](https://www.amazon.com/Primer-5th-Stanley-Lippman/dp/0321992784)
-  - [Python Crash Course](https://www.amazon.com/Python-Crash-Course-Hands-Project-Based/dp/1593279280)
+  - [C++ Primer]
+  - [Python Crash Course]
 
 ## AtCoderでの経験
 私は、AtCoderでのコンテストや課題から多くの問題を解決してきました。簡単な問題から複雑な問題まで、各課題は新しい挑戦を提供し、分析力やプログラミング思考を向上させています。
 
-### GIFを追加する方法
-次のように、GitHubまたは他のソースからGIFを追加できます。
+
 
 ```markdown
 ![モンスターのアニメーション](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWExMHVydWo4a2ptcWMyOXZ5ZnhteHgzMGRzbzRpa2w0MTJwMXJxNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/CuuSHzuc0O166MRfjt/giphy.gif)
