@@ -19,6 +19,3 @@
 私は、AtCoderでのコンテストや課題から多くの問題を解決してきました。簡単な問題から複雑な問題まで、各課題は新しい挑戦を提供し、分析力やプログラミング思考を向上させています。
 
 
-
-```markdown
-![モンスターのアニメーション](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWExMHVydWo4a2ptcWMyOXZ5ZnhteHgzMGRzbzRpa2w0MTJwMXJxNCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/CuuSHzuc0O166MRfjt/giphy.gif)
