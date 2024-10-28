@@ -134,13 +134,16 @@ if add_cnt == 0:
     print("No added submissions, end process")
 else:
     dt_now = datetime.datetime.now()
-    repo_url = "https://github.com/NinjaCipherr/atCoder.git"
-    repo = git.Repo()
-    repo.git.add("submissions/*")
-    repo.git.commit(
-        "submissions/*",
-        message="add submission: " + dt_now.strftime("%Y/%m/%d %H:%M:%S"),
-    )
-    repo.git.push("origin", "main")
-    print(f"Finished process, added {add_cnt} files")
+    repo_path = os.getcwd()
 
+    # Kiểm tra nếu đây là thư mục Git repository hợp lệ
+    if not os.path.isdir(os.path.join(repo_path, ".git")):
+        print("Error: Không tìm thấy Git repository tại đường dẫn đã chỉ định.")
+    else:
+        repo = git.Repo(repo_path)
+        repo.git.add("submissions/*")
+        repo.git.commit(
+            message="add submission: " + dt_now.strftime("%Y/%m/%d %H:%M:%S")
+        )
+        repo.git.push("origin", "main")
+        print(f"Finished process, added {add_cnt} files")
