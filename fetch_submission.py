@@ -1,8 +1,8 @@
 import requests
 import os
 import subprocess
+from bs4 import BeautifulSoup
 from time import sleep
-from bs4 import BeautifulSoup  # Đảm bảo cài đặt thư viện BeautifulSoup4
 
 # Đường dẫn API
 api_path = "https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user={user_id}&from_second={unix_second}"
@@ -39,12 +39,46 @@ def getSubmissionData(userID, from_second):
 submissions = getSubmissionData(userID, from_second)
 
 
-# Chức năng để lấy mã nguồn và lưu vào tệp
+# Hàm để lấy mã nguồn từ submission
+def get_submission_code(submission_id):
+    # Tạo URL cho submission cụ thể
+    sub_url = f"https://atcoder.jp/contests/abc377/submissions/{submission_id}"
+
+    # Gửi yêu cầu GET để lấy trang submission
+    response = requests.get(sub_url)
+
+    if response.status_code != 200:
+        print(
+            f"Error fetching submission code for ID {submission_id}: {response.status_code}"
+        )
+        return None
+
+    # Phân tích trang HTML
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Tìm phần tử chứa mã nguồn
+    code_element = soup.find("pre")  # Có thể điều chỉnh nếu cấu trúc HTML khác
+
+    if code_element:
+        code_text = code_element.get_text()
+        return code_text
+    else:
+        print(f"Code not found in submission ID {submission_id}.")
+        return None
+
+
+# Hàm để lưu mã nguồn vào tệp
 def save_submission_code(submissions):
     root = "submissions/"
     add_cnt = 0  # Đếm số tệp đã thêm
 
     for sub in submissions:
+        submission_id = sub["id"]
+        code = get_submission_code(submission_id)
+
+        if code is None:
+            continue  # Bỏ qua nếu không lấy được mã nguồn
+
         # Lấy thông tin từ submission
         problem_num = sub["problem_id"][-1]
         if problem_num.isdigit():
@@ -58,25 +92,15 @@ def save_submission_code(submissions):
 
         # Nếu tệp đã tồn tại thì bỏ qua
         if os.path.isfile(path):
+            print(f"File {path} already exists. Skipping.")
             continue
 
         # Tạo thư mục nếu chưa tồn tại
         os.makedirs(os.path.dirname(path), exist_ok=True)
 
-        # Truy cập trang submission
-        sub_url = (
-            f"https://atcoder.jp/contests/{sub['contest_id']}/submissions/{sub['id']}"
-        )
-        code_response = requests.get(sub_url)
-
-        # Lấy mã nguồn từ trang
-        soup = BeautifulSoup(code_response.text, "html.parser")
-        code_element = soup.find("pre")  # Thay đổi nếu cấu trúc HTML khác
-        code_text = code_element.text if code_element else "Mã nguồn không tìm thấy"
-
         # Ghi mã nguồn vào tệp
         with open(path, "w") as f:
-            f.write(code_text)
+            f.write(code)
 
         # Nếu là C++, định dạng lại mã nguồn
         if "C++" in sub["language"]:
@@ -91,9 +115,8 @@ def save_submission_code(submissions):
 # Lưu mã nguồn
 add_cnt = save_submission_code(submissions)
 
-# Kiểm tra số tệp đã thêm và đẩy lên GitHub
+# Kiểm tra số tệp đã thêm
 if add_cnt > 0:
     print(f"Finished process, added {add_cnt} files")
-    # Đưa mã lên GitHub (thực hiện các lệnh git tương tự như trước)
 else:
     print("No new submissions to add.")
