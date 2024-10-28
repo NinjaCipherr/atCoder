@@ -1,15 +1,20 @@
 #include <bits/stdc++.h>
 
+#include <iostream>
+#include <vector>
+
 using namespace std;
 
 int main() {
-    string S;
-    cin >> S;
-    string result;
-    for (int i = 0; i < S.length(); ++i) {
-        if (S[i] != '.') {
-            result = result + S[i];
+    string s;
+    string result = "";
+    cin >> s;
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] != '.') {
+            result = result + s[i];
         }
     }
-    cout << result;
+    cout << result << endl;
+    ;
+    return 0;
 }
