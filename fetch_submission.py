@@ -2,9 +2,10 @@ import requests
 import os
 import subprocess
 from time import sleep
+from bs4 import BeautifulSoup  # Đảm bảo cài đặt thư viện BeautifulSoup4
 
 # Đường dẫn API
-api_path = "https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user="
+api_path = "https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user={user_id}&from_second={unix_second}"
 
 # Nhập userID và thời gian bắt đầu
 userID = "pvThein"
@@ -13,7 +14,7 @@ from_second = 0  # Thay đổi giá trị này nếu cần
 
 # Hàm lấy dữ liệu submissions của người dùng
 def getSubmissionData(userID, from_second):
-    api_url = f"{api_path}{userID}&from_second={from_second}"
+    api_url = api_path.format(user_id=userID, unix_second=from_second)
     response = requests.get(api_url)
 
     # Kiểm tra mã trạng thái của phản hồi
@@ -49,7 +50,7 @@ def save_submission_code(submissions):
         if problem_num.isdigit():
             problem_num = chr(int(problem_num) + ord("a") - 1)
 
-        path = root + sub["contest_id"] + "/" + problem_num
+        path = os.path.join(root, sub["contest_id"], problem_num)
         if "C++" in sub["language"]:
             path += ".cpp"
         elif "Python" in sub["language"]:
@@ -64,17 +65,14 @@ def save_submission_code(submissions):
 
         # Truy cập trang submission
         sub_url = (
-            "https://atcoder.jp/contests/"
-            + sub["contest_id"]
-            + "/submissions/"
-            + str(sub["id"])
+            f"https://atcoder.jp/contests/{sub['contest_id']}/submissions/{sub['id']}"
         )
         code_response = requests.get(sub_url)
 
         # Lấy mã nguồn từ trang
-        # (Phần này có thể cần được điều chỉnh tùy thuộc vào cấu trúc HTML của trang)
-        # Giả sử mã nguồn nằm trong một phần tử cụ thể
-        code_text = "Mã nguồn ở đây"  # Thay thế bằng phương pháp lấy mã nguồn thực tế
+        soup = BeautifulSoup(code_response.text, "html.parser")
+        code_element = soup.find("pre")  # Thay đổi nếu cấu trúc HTML khác
+        code_text = code_element.text if code_element else "Mã nguồn không tìm thấy"
 
         # Ghi mã nguồn vào tệp
         with open(path, "w") as f:
