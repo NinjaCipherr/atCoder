@@ -3,6 +3,7 @@ import os
 import subprocess
 from bs4 import BeautifulSoup
 from time import sleep
+import html  # Thêm dòng này
 
 # Đường dẫn API
 api_path = "https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user={user_id}&from_second={unix_second}"
@@ -57,13 +58,18 @@ def get_submission_code(submission_id):
     soup = BeautifulSoup(response.text, "html.parser")
 
     # Tìm phần tử chứa mã nguồn
-    code_element = soup.find("pre")  # Có thể điều chỉnh nếu cấu trúc HTML khác
+    code_element = soup.find(
+        "pre", id="submission-code"
+    )  # Tìm phần tử với id là 'submission-code'
 
     if code_element:
-        code_text = code_element.get_text()
+        # Giải mã nội dung mã nguồn
+        code_text = html.unescape(code_element.get_text())
         return code_text
     else:
-        print(f"Code not found in submission ID {submission_id}.")
+        print(
+            f"Code not found in submission ID {submission_id}. Page content:\n{soup.prettify()}"
+        )
         return None
 
 
