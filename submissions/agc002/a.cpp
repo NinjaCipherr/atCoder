@@ -1,26 +1,19 @@
-#include <bits/stdc++.h>
-
 #include <iostream>
-#include <vector>
-
 using namespace std;
 
 int main() {
     int a, b;
-
     cin >> a >> b;
-    // for (int i = 0; i < n; ++i) {
-    //   cin >> str[i];
-    // }
-    int seki = 1;
-    for (int i = a; i <= b; i++) {
-        seki = seki * i;
-    }
-    if (seki > 0) {
-        cout << "Positive" << endl;
-    } else if (seki == 0) {
+
+    // Nếu khoảng chứa 0 thì kết quả là "Zero"
+    if (a <= 0 && b >= 0)
         cout << "Zero";
-    } else {
-        cout << "Negative";
-    }
+    // Nếu tất cả các số đều dương, kết quả là "Positive"
+    else if (a > 0)
+        cout << "Positive";
+    // Nếu tất cả các số đều âm, kiểm tra số lẻ hay chẵn số âm
+    else
+        cout << ((b - a + 1) % 2 ? "Negative" : "Positive");
+
+    return 0;
 }

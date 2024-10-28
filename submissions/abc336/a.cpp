@@ -11,7 +11,7 @@ int main() {
     for (int i = 0; i < n; i++) {
         a = a + "o";
     }
-    string result = "l" + a + "ng";
+    string result = "L" + a + "ng";
     cout << result;
     return 0;
 }

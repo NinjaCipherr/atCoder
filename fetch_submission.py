@@ -4,6 +4,8 @@ import subprocess
 from bs4 import BeautifulSoup
 from time import sleep
 import html
+import datetime
+import git  # Thêm thư viện git để thực hiện các thao tác Git
 
 # Đường dẫn API
 api_path = "https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user={user_id}&from_second={unix_second}"
@@ -39,6 +41,34 @@ def getSubmissionData(userID, from_second):
 submissions = getSubmissionData(userID, from_second)
 
 
+# Hàm thu thập các submission "AC" mới nhất theo contest
+def collectNewestAcceptedSubmissions(submissions):
+    sortedData = sorted(submissions, key=lambda x: x["id"])  # Sắp xếp theo ID
+    submits = {}  # Tạo dictionary để lưu submission mới nhất cho từng problem
+
+    for data in sortedData:
+        if data["result"] != "AC":  # Chỉ lấy submission có kết quả "AC"
+            continue
+
+        problem_id = data["problem_id"]
+        # Nếu chưa có submission nào cho problem này hoặc submission này mới hơn
+        if problem_id not in submits or submits[problem_id]["id"] < data["id"]:
+            submits[problem_id] = data  # Cập nhật submission mới nhất cho problem
+
+    result = {}  # Tạo dictionary để nhóm theo contest
+    for sub in submits.values():
+        contest_id = sub["contest_id"]
+        if contest_id not in result:
+            result[contest_id] = []  # Tạo danh sách mới nếu contest chưa tồn tại
+        result[contest_id].append(sub)  # Thêm submission vào danh sách của contest
+
+    return result
+
+
+# Gọi hàm để lấy các submission mới nhất với kết quả "AC"
+newestSubmits = collectNewestAcceptedSubmissions(submissions)
+
+
 # Hàm để lấy mã nguồn từ submission
 def get_submission_code(submission_id, contest_id):
     sub_url = f"https://atcoder.jp/contests/{contest_id}/submissions/{submission_id}"
@@ -66,51 +96,69 @@ def get_submission_code(submission_id, contest_id):
 
 
 # Hàm để lưu mã nguồn vào tệp
-def save_submission_code(submissions):
+def save_submission_code(newestSubmits):
     root = "submissions/"
     add_cnt = 0
 
-    for sub in submissions:
-        submission_id = sub["id"]
-        contest_id = sub["contest_id"]  # Lấy contest_id từ submission
-        code = get_submission_code(submission_id, contest_id)
+    for contest_id, submissions in newestSubmits.items():
+        for sub in submissions:
+            submission_id = sub["id"]
+            code = get_submission_code(submission_id, contest_id)
 
-        if code is None:
-            continue
+            if code is None:
+                continue
 
-        problem_num = sub["problem_id"][-1]
-        if problem_num.isdigit():
-            problem_num = chr(int(problem_num) + ord("a") - 1)
+            problem_num = sub["problem_id"][-1]
+            if problem_num.isdigit():
+                problem_num = chr(int(problem_num) + ord("a") - 1)
 
-        path = os.path.join(root, contest_id, problem_num)
-        if "C++" in sub["language"]:
-            path += ".cpp"
-        elif "Python" in sub["language"]:
-            path += ".py"
+            path = os.path.join(root, contest_id, problem_num)
+            if "C++" in sub["language"]:
+                path += ".cpp"
+            elif "Python" in sub["language"]:
+                path += ".py"
 
-        if os.path.isfile(path):
-            print(f"File {path} already exists. Skipping.")
-            continue
+            if os.path.isfile(path):
+                print(f"File {path} already exists. Skipping.")
+                continue
 
-        os.makedirs(os.path.dirname(path), exist_ok=True)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
 
-        with open(path, "w") as f:
-            f.write(code)
+            with open(path, "w") as f:
+                f.write(code)
 
-        if "C++" in sub["language"]:
-            subprocess.call(["clang-format", "-i", "-style=file", path])
+            if "C++" in sub["language"]:
+                subprocess.call(["clang-format", "-i", "-style=file", path])
 
-        add_cnt += 1
-        sleep(3)
+            add_cnt += 1
+            sleep(3)
 
     return add_cnt
 
 
 # Lưu mã nguồn
-add_cnt = save_submission_code(submissions)
+add_cnt = save_submission_code(newestSubmits)
 
-# Kiểm tra số tệp đã thêm
+# Kiểm tra số tệp đã thêm và upload lên GitHub
 if add_cnt > 0:
     print(f"Finished process, added {add_cnt} files")
+
+    # Tự động upload lên GitHub
+    dt_now = datetime.datetime.now()
+    repo_path = (
+        "/home/green-code/atcoder_submissions"  # Đường dẫn đến thư mục chứa repo local
+    )
+
+    try:
+        # Khởi tạo repo từ đường dẫn local, không phải URL
+        repo = git.Repo(repo_path)
+        repo.git.add("submissions/*")
+        repo.git.commit(
+            message="add submission: " + dt_now.strftime("%Y/%m/%d %H:%M:%S")
+        )
+        repo.git.push("origin", "main")
+        print("Successfully pushed to GitHub.")
+    except Exception as e:
+        print(f"Error during Git operations: {e}")
 else:
     print("No new submissions to add.")

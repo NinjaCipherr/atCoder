@@ -9,11 +9,13 @@ int main() {
     int a, b, c;
     cin >> a >> b >> c;
     int d = a - b - c;
-    if ((a + d > b) && (b + d > a)) {
-        cout << "No";
-    } else {
-        cout << "Yes";
-    }
 
+    if (b > c + d) {
+        cout << "Yes";
+    } else if (c > b + d) {
+        cout << "Yes";
+    } else {
+        cout << "No";
+    }
     return 0;
 }

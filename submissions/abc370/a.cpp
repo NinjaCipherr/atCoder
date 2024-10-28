@@ -10,7 +10,7 @@ int main() {
     cin >> a >> b;
     if (a == 1 && b == 0) {
         cout << "Yes";
-    } else if (a == 1 && b == 1) {
+    } else if (a == b) {
         cout << "Invalid";
     } else {
         cout << "No";

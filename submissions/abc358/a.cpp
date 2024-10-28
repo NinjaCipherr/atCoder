@@ -3,7 +3,7 @@ using namespace std;
 int main() {
     string s, t;
     cin >> s >> t;
-    if (s == "Atcoder" && t == "Land") {
+    if (s == "AtCoder" && t == "Land") {
         cout << "Yes";
     } else {
         cout << "No";
