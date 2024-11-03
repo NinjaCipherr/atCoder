@@ -11,7 +11,7 @@ import git  # Thêm thư viện git để thực hiện các thao tác Git
 api_path = "https://kenkoooo.com/atcoder/atcoder-api/v3/user/submissions?user={user_id}&from_second={unix_second}"
 
 # Nhập userID và thời gian bắt đầu
-userID = "pvThein"
+userID = "johnweed"
 from_second = 0  # Thay đổi giá trị này nếu cần
 
 
